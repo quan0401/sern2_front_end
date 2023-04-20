@@ -9,10 +9,23 @@ const getAllUsers = async () => {
 };
 
 const getUsersPagination = async (offset, limit) => {
-  const result = await instance.post("/user-table", {
+  const result = await instance.post("/user-table/view", {
     offset,
     limit,
   });
   return result.data;
 };
-export { getAllUsers, getUsersPagination };
+
+const getAllGroups = async () => {
+  const result = await instance.get("/user/group");
+  return result.data;
+};
+
+const createNewUser = async (userData) => {
+  const result = await instance.post("/user/create-user", {
+    ...userData,
+  });
+  return result.data;
+};
+
+export { getAllUsers, getUsersPagination, getAllGroups, createNewUser };

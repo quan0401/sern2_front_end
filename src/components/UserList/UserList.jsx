@@ -3,12 +3,18 @@ import { UserContext } from "../../context/UserContext";
 import { getAllUsers, getUsersPagination } from "../../setup/axios";
 
 import ReactPaginate from "react-paginate";
+import AddUserModal from "./Modal/AddUserModal";
 
 function UserList() {
   const [users, setUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [limit, setLimit] = useState(5);
   const [pageCount, setPageCount] = useState(10);
+  const [showModal, setShowModal] = useState(false);
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
 
   const handlePageClick = (e) => {
     setCurrentPage(e.selected);
@@ -30,11 +36,17 @@ function UserList() {
     };
     fetchUsersPagination();
   }, [currentPage]);
+
   return (
     <>
       <div className="table">
         <h1>User Table</h1>
-        <button className="btn btn-primary mb-3 ">Add User</button>
+        <button
+          onClick={() => setShowModal(true)}
+          className="btn btn-primary mb-3 "
+        >
+          Add User
+        </button>
         <table className="table table-striped table-bordered">
           <thead>
             <tr>
@@ -50,7 +62,7 @@ function UserList() {
           <tbody>
             {users.map((user, index) => (
               <tr key={index}>
-                <th scope="row">{index + 1}</th>
+                <th scope="row">{currentPage * limit + index + 1}</th>
                 <td>{user.username}</td>
                 <td>{user.email}</td>
                 <td>{user.phone}</td>
@@ -84,6 +96,7 @@ function UserList() {
           />
         </div>
       </div>
+      <AddUserModal show={showModal} onHide={handleCloseModal} />
     </>
   );
 }

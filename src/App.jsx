@@ -1,6 +1,11 @@
 import { useState } from "react";
 import Navigation from "./components/Navigation/Navigation";
-import { Route, Routes, BrowserRouter as Router } from "react-router-dom";
+import {
+  Route,
+  Routes,
+  BrowserRouter as Router,
+  Navigate,
+} from "react-router-dom";
 import Home from "./components/Home";
 import publicRoutes from "./routes/public";
 import "./App.scss";
@@ -22,6 +27,7 @@ function App() {
                 element={<route.component />}
               />
             ))}
+            <Route path="*" element={<h1>Non-existent page</h1>} />
           </Routes>
         </div>
       </div>
