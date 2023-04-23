@@ -7,9 +7,7 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <header>
-          <Navigation />
-        </header>
+        <header>{/* <Navigation /> */}</header>
 
         <div className="App-container container">
           <Routes>

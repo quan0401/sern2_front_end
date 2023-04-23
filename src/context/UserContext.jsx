@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect } from "react";
-import { getAllUsers } from "../setup/axios";
+import { getAllUsers } from "../service/userService";
 
 const UserContext = createContext();
 

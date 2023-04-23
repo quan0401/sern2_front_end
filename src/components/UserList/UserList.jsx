@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../../context/UserContext";
-import { getAllUsers, getUsersPagination } from "../../setup/axios";
+import { getAllUsers, getUsersPagination } from "../../service/userService";
 
 import ReactPaginate from "react-paginate";
 import AddUserModal from "./Modal/AddUserModal";

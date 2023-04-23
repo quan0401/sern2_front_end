@@ -3,42 +3,6 @@ const instance = axios.create({
   baseURL: "http://localhost:8082/api",
 });
 
-const getAllUsers = async () => {
-  const users = await instance.get("/users");
-  return users.data;
-};
-
-const getUsersPagination = async (offset, limit) => {
-  const result = await instance.post("/user-table/view", {
-    offset,
-    limit,
-  });
-  return result.data;
-};
-
-const getAllGroups = async () => {
-  const result = await instance.get("/user/group");
-  return result.data;
-};
-
-const createNewUser = async (userData) => {
-  const result = await instance.post("/user/create-user", {
-    ...userData,
-  });
-  return result.data;
-};
-
-const checkCreateValidationn = async (data) => {
-  try {
-    const result = await instance.post("/user/create-user-validation", {
-      ...data,
-    });
-    return result.data;
-  } catch (error) {
-    return error.response.data;
-  }
-};
-
 instance.interceptors.response.use(
   function (response) {
     // Any status code that lie within the range of 2xx cause this function to trigger
@@ -90,11 +54,4 @@ instance.interceptors.response.use(
     // return Promise.reject(error);
   }
 );
-
-export {
-  getAllUsers,
-  getUsersPagination,
-  getAllGroups,
-  createNewUser,
-  checkCreateValidationn,
-};
+export { instance };

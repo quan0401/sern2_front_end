@@ -5,7 +5,7 @@ import {
   checkCreateValidationn,
   createNewUser,
   getAllGroups,
-} from "../../../setup/axios";
+} from "../../../service/userService";
 import UseDebounce from "../useDebounce";
 
 const defaultUserData = {
