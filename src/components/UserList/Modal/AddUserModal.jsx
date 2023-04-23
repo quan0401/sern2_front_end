@@ -1,7 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
-import { createNewUser, getAllGroups } from "../../../setup/axios";
+import {
+  checkCreateValidationn,
+  createNewUser,
+  getAllGroups,
+} from "../../../setup/axios";
+import UseDebounce from "../useDebounce";
 
 const defaultUserData = {
   username: "",
@@ -16,20 +21,56 @@ const defaultUserData = {
 const defaultValidationStatus = {
   username: null,
   email: null,
-  phone: null,
-  address: null,
   password: null,
 };
+
+const getChangeKey = (oldObj, newObj) => {
+  const keys = Object.keys(defaultValidationStatus);
+  for (let key of keys) {
+    if (oldObj[key] !== newObj[key]) return key;
+  }
+  return -1;
+};
+
 function AddUserModal({ ...props }) {
   const [groups, setGroups] = useState([]);
   const [newUser, setNewUser] = useState(defaultUserData);
   const [validationStatus, setValidationStatus] = useState(
     defaultValidationStatus
   );
+  const [inputMessage, SetInputMessage] = useState(defaultValidationStatus);
+  const [changing, setChanging] = useState(defaultUserData);
+
+  const debounceNewUser = UseDebounce(newUser, 1000);
 
   const handleSubmitNewUser = async () => {
     submitValidation();
   };
+
+  useEffect(() => {
+    const onInputCheckApi = async () => {
+      try {
+        const key = getChangeKey(changing, debounceNewUser);
+        if (key !== -1) {
+          const result = await checkCreateValidationn({
+            fieldName: key,
+            data: debounceNewUser[key],
+          });
+          if (+result.EC === 0)
+            setValidationStatus((prev) => ({ ...prev, [key]: true }));
+          else setValidationStatus((prev) => ({ ...prev, [key]: false }));
+
+          const { EM } = result;
+          SetInputMessage((prev) => ({ ...prev, [key]: EM }));
+
+          setChanging(debounceNewUser);
+        }
+      } catch (error) {
+        console.log("error:", error);
+      }
+    };
+    onInputCheckApi();
+  }, [debounceNewUser]);
 
   useEffect(() => {
     const submitNewUser = async () => {
@@ -52,6 +93,7 @@ function AddUserModal({ ...props }) {
   // User input validation
   const submitValidation = () => {
     const keys = Object.keys(validationStatus);
+
     keys.forEach((key) => {
       setValidationStatus((prev) => ({ ...prev, [key]: true }));
       if (newUser[key].trim() === "")
@@ -72,6 +114,7 @@ function AddUserModal({ ...props }) {
           if (password.trim() === "" || password.length < 8) {
             setValidationStatus((prev) => ({ ...prev, [key]: false }));
           }
+          break;
       }
     });
   };
@@ -106,7 +149,7 @@ function AddUserModal({ ...props }) {
       <Modal.Body>
         <form>
           <div className="row ">
-            <div className="form-group col-6">
+            <div className="form-group col-6 mb-3">
               <label htmlFor="email">Email address</label>
               <input
                 required
@@ -123,10 +166,10 @@ function AddUserModal({ ...props }) {
                 aria-describedby="emailHelp"
                 placeholder="Enter email"
               />
-              <small id="emailHelp" className="form-text text-muted">
-                We'll never share your email with anyone else.
-              </small>
+              <div className="valid-feedback">{inputMessage.email}</div>
+              <div className="invalid-feedback">{inputMessage.email}</div>
             </div>
+
             <div className="form-group col-6">
               <label htmlFor="username">Username</label>
               <input
@@ -143,9 +186,10 @@ function AddUserModal({ ...props }) {
                 value={newUser.username}
                 placeholder="Username"
               />
-              <div className="valid-feedback">Looks good</div>
-              <div className="invalid-feedback"></div>
+              <div className="valid-feedback">{inputMessage.username}</div>
+              <div className="invalid-feedback">{inputMessage.username}</div>
             </div>
+
             <div className="form-group col-12 mb-3">
               <label htmlFor="address">Address</label>
               <input
@@ -156,12 +200,13 @@ function AddUserModal({ ...props }) {
                   }))
                 }
                 type="text"
-                className={"form-control" + isValid("address")}
+                className={"form-control"}
                 id="address"
                 value={newUser.address}
                 placeholder="Address"
               />
             </div>
+
             <div className="form-group col-6">
               <label htmlFor="phone">Phone</label>
               <input
@@ -173,7 +218,7 @@ function AddUserModal({ ...props }) {
                   }))
                 }
                 type="text"
-                className={"form-control" + isValid("phone")}
+                className={"form-control"}
                 id="phone"
                 value={newUser.phone}
                 placeholder="Phone"
@@ -195,6 +240,8 @@ function AddUserModal({ ...props }) {
                 value={newUser.password}
                 placeholder="Password"
               />
+              <div className="valid-feedback">{inputMessage.password}</div>
+              <div className="invalid-feedback">{inputMessage.password}</div>
             </div>
 
             <div className="col-6 mt-3">
